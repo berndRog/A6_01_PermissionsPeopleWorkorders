@@ -16,6 +16,6 @@ interface IWorkordersRepository {
    suspend fun update(workorderDto: WorkorderDto): Boolean
    suspend fun remove(workorderDto: WorkorderDto): Boolean
 
-   suspend fun loadWorkorderWithPerson(id: UUID): Map<WorkorderDto, PersonDto?>
+   suspend fun findByIdWithPerson(id: UUID): Map<WorkorderDto, PersonDto?>
 
 }

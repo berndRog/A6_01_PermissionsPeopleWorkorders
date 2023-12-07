@@ -3,6 +3,7 @@ package de.rogallab.mobile.data.seed
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import de.rogallab.mobile.R
 import de.rogallab.mobile.data.io.deleteFileOnInternalStorage
@@ -89,9 +90,9 @@ class Seed @Inject constructor(
 
       // Uri of images
       val imagesUri = mutableListOf<String>()
-      drawables.forEach {
-         val bitmap = BitmapFactory.decodeResource(_resources, it)
-         bitmap?.let { bitmap ->
+      drawables.forEach { drawable: Int ->
+         val decodedBitmap = BitmapFactory.decodeResource(_resources, drawable)
+         decodedBitmap?.let { bitmap: Bitmap ->
             writeImageToInternalStorage(_context, bitmap)?.let { uriPath: String? ->
                logDebug("ok>SaveImage          .", "Uri $uriPath")
                uriPath?.let {

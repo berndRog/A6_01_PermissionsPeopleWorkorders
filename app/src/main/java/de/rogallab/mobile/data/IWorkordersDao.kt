@@ -36,6 +36,6 @@ interface IWorkordersDao {
       +   "LEFT JOIN people "
       +   "ON   workorders.personId = people.id "
       +   "WHERE workorders.id = :id")
-   suspend fun loadWorkorderWithPerson(id:UUID): Map<WorkorderDto, PersonDto?>
+   suspend fun findByIdWithPerson(id:UUID): Map<WorkorderDto, PersonDto?>
 
 }

@@ -65,7 +65,7 @@ fun WorkorderDetailScreen(
       }
    )
 
-   val uiStateWorkorderFlow by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+   val uiStateWorkorderFlow by viewModel.uiStateWorkorderFlow.collectAsStateWithLifecycle()
    LogUiStates(uiStateWorkorderFlow,"UiState Workorder", tag )
 
    val snackbarHostState = remember { SnackbarHostState() }
@@ -76,7 +76,7 @@ fun WorkorderDetailScreen(
          viewModel.readByIdWithPerson(id)
       }
    } ?: run {
-      viewModel.onUiStateFlowChange(UiState.Error("No id for person is given"))
+      viewModel.onUiStateWorkorderFlowChange(UiState.Error("No id for person is given"))
    }
 
    Scaffold(
@@ -86,13 +86,13 @@ fun WorkorderDetailScreen(
             navigationIcon = {
                IconButton(onClick = {
                   viewModel.update(id!!)
-                  if(viewModel.uiStateFlow.value.upHandler) {
+                  if(viewModel.uiStateWorkorderFlow.value.upHandler) {
                      logInfo(tag, "Reverse Navigation (Up) viewModel.update()")
                      navController.navigate(route = NavScreen.WorkordersList.route) {
                         popUpTo(route = NavScreen.WorkorderDetail.route) { inclusive = true }
                      }
                   }
-                  if(viewModel.uiStateFlow.value.backHandler) {
+                  if(viewModel.uiStateWorkorderFlow.value.backHandler) {
                      logInfo(tag, "Back Navigation, Error in viewModel.add()")
                      navController.popBackStack(
                         route = NavScreen.WorkordersList.route,
@@ -209,7 +209,7 @@ fun WorkorderDetailScreen(
          snackbarHostState = snackbarHostState,
          navController = navController,
          routePopBack = NavScreen.WorkordersList.route,
-         onUiStateFlowChange = { viewModel.onUiStateFlowChange(it) },
+         onUiStateFlowChange = { viewModel.onUiStateWorkorderFlowChange(it) },
          tag = tag
       )
    }

@@ -3,7 +3,7 @@ package de.rogallab.mobile.domain.utilities
 import android.util.Log
 import de.rogallab.mobile.AppStart.Companion.isDebug
 import de.rogallab.mobile.AppStart.Companion.isInfo
-import de.rogallab.mobile.AppStart.Companion.isverbose
+import de.rogallab.mobile.AppStart.Companion.isVerbose
 
 fun logError(tag: String, message: String) {
    val msg = formatMessage(message)
@@ -24,7 +24,7 @@ fun logDebug(tag: String, message: String) {
 }
 
 fun logVerbose(tag: String, message: String) {
-   if (isverbose) Log.v(tag, message)
+   if (isVerbose) Log.v(tag, message)
 }
 
 private fun formatMessage(message: String) =

@@ -134,9 +134,9 @@ class WorkordersViewModel @Inject constructor(
    // StateFlow for Input&Detail Screens
    private var _uiStateWorkordereFlow: MutableStateFlow<UiState<Workorder>> =
       MutableStateFlow(value = UiState.Empty)
-   val uiStateFlow: StateFlow<UiState<Workorder>>
+   val uiStateWorkorderFlow: StateFlow<UiState<Workorder>>
       get() = _uiStateWorkordereFlow
-   fun onUiStateFlowChange(uiState: UiState<Workorder>) {
+   fun onUiStateWorkorderFlowChange(uiState: UiState<Workorder>) {
       _uiStateWorkordereFlow.value = uiState
       if(uiState is UiState.Error) {
          logError(PeopleViewModel.tag,uiState.message)
@@ -189,7 +189,7 @@ class WorkordersViewModel @Inject constructor(
       try {
          _coroutineScope.launch {
             val map = _coroutineScope.async {
-               return@async _repository.loadWorkorderWithPerson(id)
+               return@async _repository.findByIdWithPerson(id)
             }.await()
             val workorderDto = map.keys.first()
             val personDto = map.values.firstOrNull()

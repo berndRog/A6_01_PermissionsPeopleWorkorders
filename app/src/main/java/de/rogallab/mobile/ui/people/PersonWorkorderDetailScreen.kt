@@ -65,7 +65,7 @@ fun PersonWorkorderDetailScreen(
       }
    )
 
-   val uiStateWorkorder by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+   val uiStateWorkorder by viewModel.uiStateWorkorderFlow.collectAsStateWithLifecycle()
    LogUiStates(uiStateWorkorder,"UiState Workorder", tag )
 
    val snackbarHostState = remember { SnackbarHostState() }
@@ -76,7 +76,7 @@ fun PersonWorkorderDetailScreen(
          viewModel.readByIdWithPerson(workorderId)
       }
    } ?: run {
-      viewModel.onUiStateFlowChange(UiState.Error("No id for person is given"))
+      viewModel.onUiStateWorkorderFlowChange(UiState.Error("No id for person is given"))
    }
 
    Scaffold(
@@ -86,14 +86,14 @@ fun PersonWorkorderDetailScreen(
             navigationIcon = {
                IconButton(onClick = {
                   viewModel.update(workorderId!!)
-                  if(viewModel.uiStateFlow.value.upHandler) {
+                  if(viewModel.uiStateWorkorderFlow.value.upHandler) {
                      logInfo(tag, "Reverse Navigation (Up) viewModel.update()")
                      navController.navigate(
                         route = NavScreen.PersonWorkorderOverview.route + "/${viewModel.assignedPerson!!.id}") {
                         popUpTo(route = NavScreen.PersonWorkorderDetail.route) { inclusive = true }
                      }
                   }
-                  if(viewModel.uiStateFlow.value.backHandler) {
+                  if(viewModel.uiStateWorkorderFlow.value.backHandler) {
                      logInfo(tag, "Back Navigation, Error in viewModel.add()")
                      navController.popBackStack(
                         route = NavScreen.PersonWorkorderOverview.route + "/${viewModel.assignedPerson!!.id}",
@@ -199,7 +199,7 @@ fun PersonWorkorderDetailScreen(
          snackbarHostState = snackbarHostState,
          navController = navController,
          routePopBack = NavScreen.WorkordersList.route,
-         onUiStateFlowChange = { viewModel.onUiStateFlowChange(it) },
+         onUiStateFlowChange = { viewModel.onUiStateWorkorderFlowChange(it) },
          tag = tag
       )
    }

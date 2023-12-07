@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">Room Tasks</string>
+  <string name="app_name">ManageWorkorders</string>
   <string name="person_input">Neue Person</string>
   <string name="person_detail">Person bearbeiten</string>
   <string name="people_list">Personen</string>

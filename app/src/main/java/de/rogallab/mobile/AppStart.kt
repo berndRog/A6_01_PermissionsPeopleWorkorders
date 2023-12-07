@@ -20,7 +20,7 @@ class AppStart : Application() {
       private const val tag = "ok>AppStart           ."
       const val isInfo = true
       const val isDebug = true
-      const val isverbose = false
+      const val isVerbose = true
       const val database_name:    String = "A6_01_PermissionsPeopleWorkorders.db"
       const val database_version: Int    = 1
    }

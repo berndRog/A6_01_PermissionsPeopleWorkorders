@@ -61,7 +61,7 @@ fun WorkorderInputScreen(
       }
    )
 
-   val uiStateWorkorderFlow by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+   val uiStateWorkorderFlow by viewModel.uiStateWorkorderFlow.collectAsStateWithLifecycle()
    LogUiStates(uiStateWorkorderFlow,"UiState Workorder", tag )
 
    val snackbarHostState = remember { SnackbarHostState() }
@@ -146,7 +146,7 @@ fun WorkorderInputScreen(
             snackbarHostState = snackbarHostState,
             navController = navController,
             routePopBack = NavScreen.WorkordersList.route,
-            onUiStateFlowChange = { viewModel.onUiStateFlowChange(it) },
+            onUiStateFlowChange = { viewModel.onUiStateWorkorderFlowChange(it) },
             tag = tag
          )
       }

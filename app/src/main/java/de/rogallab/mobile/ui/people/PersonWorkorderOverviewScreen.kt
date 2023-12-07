@@ -82,7 +82,6 @@ fun PersonWorkorderOverviewScreen(
       by workordersViewModel.uiStateListWorkorderFlow.collectAsStateWithLifecycle()
    LogUiStates(uiStateListWorkorder, "UiState List<Workorder>", tag)
 
-   val context = LocalContext.current
    val snackbarHostState = remember { SnackbarHostState() }
 
    personId?.let {
@@ -101,9 +100,6 @@ fun PersonWorkorderOverviewScreen(
             title = { Text(stringResource(R.string.personwork_overview)) },
             navigationIcon = {
                IconButton(onClick = {
-                  if (!isInputValid(context, peopleViewModel)) {
-                     peopleViewModel.update(personId!!)
-                  }
                   if (peopleViewModel.uiStateFlow.value.upHandler) {
                      logInfo(tag, "Reverse Navigation (Up) viewModel.update()")
                      navController.navigate(route = NavScreen.PeopleList.route) {
@@ -160,10 +156,11 @@ fun PersonWorkorderOverviewScreen(
 
          var list: MutableList<Workorder> = remember { mutableListOf() }
          if (uiStateListWorkorder is UiState.Success) {
-            list = (uiStateListWorkorder as UiState.Success<List<Workorder>>).data?.toMutableList() as MutableList<Workorder>
-            logDebug(tag, "uiStateWorkorders.Success items.size ${list.size}")
+            (uiStateListWorkorder as UiState.Success<List<Workorder>>).data?.let { it: List<Workorder> ->
+               list = it.toMutableList()
+               logVerbose(tag, "uiStateListWorkorder.Success items.size ${list.size}")
+            }
          }
-
          DefaultWorkordersList(
             workorders = list,
             onAddWorkorder = { peopleViewModel.addWorkorder(it)},
@@ -255,10 +252,12 @@ private fun AssignedWorkorders(
                      return@rememberDismissState true
                   } else if (it == DismissValue.DismissedToStart) {
                      logDebug("ok>SwipeToDismiss", "-> Delete")
-                     onRemoveWorkorder(workorder)
-                     navController.navigate(NavScreen.PersonWorkorderOverview.route + "/$personId")
-                     return@rememberDismissState true
-                  }
+                     if(workorder.state != WorkState.Started &&
+                        workorder.state != WorkState.Completed)   {
+                        onRemoveWorkorder(workorder)
+                        navController.navigate(NavScreen.PersonWorkorderOverview.route + "/$personId")
+                        return@rememberDismissState true
+                     }                  }
                   return@rememberDismissState false
                }
             )

@@ -1,63 +1,55 @@
 package de.rogallab.mobile.ui.permissions
-
-
 import android.content.Context
 
 class PermissionCamera : IPermissionText {
-//	<uses-feature
-//		android:name="android.hardware.camera"
-//		android:required="false" />
-//	<uses-permission android:name="android.permission.CAMERA" />
-   override fun getDescription(context: Context, isPermanentlyDeclined: Boolean): String {
-      return if (isPermanentlyDeclined) {
-         "Es scheint als hätten Sie den Zugriff auf die Kamera mehrfach abgelehnt. " +
-            "Sie können diese Berechtigung nur noch über die App Einstellungen ändern."
-      } else {
-         "Die App erfordert den Zugriff auf die Kamera, um ein Foto aufzunehmen."
+   override fun getDescription(
+      isPermanentlyDeclined: Boolean
+   ): String =
+      when (isPermanentlyDeclined) {
+         true -> "Sie haben den Zugriff auf die Kamera mehrfach abgelehnt. " +
+            "Daher können Sie diese Berechtigung nur noch über die App Einstellungen ändern."
+         false -> "App erfordert den Zugriff auf die Kamera, um ein Foto aufzunehmen."
       }
-   }
 }
 
 class PermissionCoarseLocation : IPermissionText {
-   override fun getDescription(context: Context, isPermanentlyDeclined: Boolean): String {
-      return if (isPermanentlyDeclined) {
-         "Es scheint als hätten Sie den Zugriff auf die ungefähre Ortsbestimmung mehrfach abgelehnt. "+
-            "Sie können diese Berechtigung nur noch über die App Einstellungen ändern."
-      } else {
-         "Die App erfordert den Zugriff auf die ungefähre Ortsbestimmung, um ihre Position zu ermitteln."
+   override fun getDescription(
+      isPermanentlyDeclined: Boolean
+   ): String =
+      when (isPermanentlyDeclined) {
+         false -> "Sie haben den Zugriff auf die ungefähre Ortsbestimmung mehrfach abgelehnt. " +
+            "Die Berechtigung kann nur noch über die App Einstellungen geändert werden."
+         true -> "App erfordert den Zugriff auf die ungefähre Ortsbestimmung."
       }
-   }
 }
 
 class PermissionFineLocation : IPermissionText {
-   override fun getDescription(context: Context, isPermanentlyDeclined: Boolean): String {
-      return if (isPermanentlyDeclined) {
-         "Es scheint als hätten Sie den Zugriff auf die genaue Ortsbestimmung mehrfach abgelehnt. " +
-            "Sie können diese Berechtigung nur noch über die App Einstellungen ändern."
-      } else {
-         "Die App erfordert die den Zugriff auf die genaue Ortsbestimmung, um ihre genaue Position zu ermitteln."
+   override fun getDescription(
+      isPermanentlyDeclined: Boolean
+   ): String =
+      when (isPermanentlyDeclined) {
+         false -> "Sie haben den Zugriff auf die genaue Ortsbestimmung mehrfach abgelehnt. " +
+            "Die Berechtigung kann nur noch über die App Einstellungen geändert werden."
+         true -> "App erfordert die den Zugriff auf die genaue Ortsbestimmung"
       }
-   }
 }
 
+
+class PermissionTextNotFound : IPermissionText {
+   override fun getDescription(
+      isPermanentlyDeclined: Boolean
+   ): String = "Permission text not found"
+ }
+
 class PermissionRecordAudio : IPermissionText {
-   override fun getDescription(context: Context, isPermanentlyDeclined: Boolean): String {
-      return if (isPermanentlyDeclined) {
-         "It seems you permanently declined microphone permission. " +
-            "You can go to the app settings to grant it."
-      } else {
-         "This app needs access to your microphone so that your friends " +
-            "can hear you in a call."
+   override fun getDescription(
+      isPermanentlyDeclined: Boolean
+   ): String =
+      when (isPermanentlyDeclined) {
+         false -> "Sie haben den Zugriff auf das Mirofon mehrfach abgelehnt. " +
+            "Die Berechtigung kann nur noch über die App Einstellungen geändert werden."
+         true -> "App erfordert die den Zugriff auf das Mikrofon"
+
       }
-   }
 }
-class PermissionPhoneCall : IPermissionText {
-   override fun getDescription(context: Context, isPermanentlyDeclined: Boolean): String {
-      return if (isPermanentlyDeclined) {
-         "Es scheint als hätten Sie den Zugriff auf Anrufen mehrfach abgelehnt. " +
-            "Sie können diese Entscheidung nur über die App Einstellungen ändern."
-      } else {
-         "Die App erfordert den Zugriff auf das Telefon, um einen Anruf durchführen zu können."
-      }
-   }
-}
+

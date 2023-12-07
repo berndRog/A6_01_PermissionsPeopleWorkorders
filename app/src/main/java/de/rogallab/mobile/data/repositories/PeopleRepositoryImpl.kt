@@ -75,7 +75,7 @@ class PeopleRepositoryImpl @Inject constructor(
          return@withContext true
       }
 
-   override suspend fun findbyIdWithWorkorders(id: UUID): PersonDtoWithWorkorderDtos? =
+   override suspend fun selectByIdWithWorkorders(id: UUID): PersonDtoWithWorkorderDtos? =
       withContext(_dispatcher + _exceptionHandler) {
          val personDtoWithWorkorderDtos = _peopleDao.findbyIdWithWorkorders(id)
          logDebug(tag, "findByIdWithWorkorders() " +
@@ -84,7 +84,7 @@ class PeopleRepositoryImpl @Inject constructor(
          return@withContext personDtoWithWorkorderDtos
       }
 
-   override suspend fun loadPersonWithWorkorders(id: UUID): Map<PersonDto, List<WorkorderDto>> =
+   override suspend fun findByIdWithWorkorders(id: UUID): Map<PersonDto, List<WorkorderDto>> =
       withContext(_dispatcher + _exceptionHandler) {
          val map = _peopleDao.loadPersonWithWorkorders(id)
          logDebug(tag, "findByIdWithWorkorders()")

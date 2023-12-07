@@ -1,6 +1,5 @@
 package de.rogallab.mobile.ui.permissions
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -11,151 +10,159 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.rogallab.mobile.domain.utilities.logDebug
+import de.rogallab.mobile.domain.utilities.logVerbose
 import de.rogallab.mobile.ui.MainViewModel
 import de.rogallab.mobile.ui.openAppSettings
 
 @Composable
 fun RequestPermissions(
-   permissionsToRequest: Array<String>,
-   mainViewModel: MainViewModel = hiltViewModel()
+   viewModel: MainViewModel = hiltViewModel()
 ) {
    val tag = "ok>RequestPermissions ."
 
-   val activity = (LocalContext.current as Activity)
-   val context: Context = activity.applicationContext ?:
-      throw Exception("context is null in RequestPermisssions")
-
+   val activity: Activity = (LocalContext.current as Activity)
+   val context: Context = activity.applicationContext
 
    // Setup multiple permission request launcher
-   val multiplePermissionRequestLauncher = rememberLauncherForActivityResult(
+   val multiplePermissionsRequestLauncher = rememberLauncherForActivityResult(
+
       contract = ActivityResultContracts.RequestMultiplePermissions(),
-      // callback: handle permissions results, i.e store them into the MainViewModel
+
       onResult = { permissionMap: Map<String, @JvmSuppressWildcards Boolean> ->
-         logDebug(tag, "PermissionRequestLauncher onResult: ")
-         permissionsToRequest.forEach { permission ->
-            logDebug(tag,"$permission isGranted ${permissionMap[permission]}")
-            mainViewModel.addPermission(
+         logVerbose(tag, "rememberLauncherForActivityResult.onResult")
+         permissionMap.keys.forEach { permission ->
+            viewModel.addPermission(
                permission = permission,
-               isGranted = permissionMap[permission] == true  // key = true
+               isGranted = permissionMap[permission] == true
             )
          }
       }
    )
 
-   if (!arePermissionsAlreadyGranted(context, permissionsToRequest, tag)) {
-      // Request permissions, i.e. launch dialog
+   if (!arePermissionsAlreadyGranted(context, viewModel.permissionsToRequest)) {
       LaunchedEffect(true) {
-         val cameraPermission = Manifest.permission.CAMERA
-         logDebug(tag, "PermissionRequestLauncher launched")
-         multiplePermissionRequestLauncher.launch(
-            permissionsToRequest
+         logVerbose(tag, "rememberLauncherForActivityResult.launch()")
+         multiplePermissionsRequestLauncher.launch(
+            viewModel.permissionsToRequest.toTypedArray()
          )
       }
    }
 
    // if a requested permission is not granted -> ask again or goto appsettings
-   mainViewModel.permissionQueue
+   viewModel.visiblePermissionQueue
       .reversed()
       .forEach { permission ->
+
          logDebug(tag, "permissionQueue $permission")
 
-         var dialogOpen by remember {  mutableStateOf(false) }
+         var isPermanentlyDeclined: Boolean =
+            !shouldShowRequestPermissionRationale(activity, permission)
+         logVerbose(tag, "isPermanentlyDeclined $isPermanentlyDeclined")
 
-         val isPermanentlyDeclined =
-            activity.shouldShowRequestPermissionRationale(permission)
-         logDebug(tag, "permissionsQueue isPermanentlyDeclined $isPermanentlyDeclined")
+         val permissionText: String =
+            viewModel.getPermissionText(permission, isPermanentlyDeclined)
+         logVerbose(tag, "permisionText $permissionText")
 
-         // get the text for requested permission
-         val permissionText: IPermissionText? = when (permission) {
-            Manifest.permission.CAMERA -> PermissionCamera()
-            Manifest.permission.RECORD_AUDIO -> PermissionRecordAudio()
-            Manifest.permission.ACCESS_COARSE_LOCATION -> PermissionCoarseLocation()
-            Manifest.permission.ACCESS_FINE_LOCATION -> PermissionFineLocation()
-            else -> null
-         }
-         logDebug(tag, "permissionsQueue " +
-            "${permissionText?.getDescription(context, isPermanentlyDeclined)}")
+//         PermissionDialog(
+//            permissionText = permissionText,
+//            isPermanentlyDeclined = isPermanentlyDeclined,
+//            onDismiss = viewModel::dismissDialog,
+//            onOkClick = {
+//               viewModel.dismissDialog()
+//               multiplePermissionsRequestLauncher.launch(
+//                  arrayOf(permission)
+//               )
+//            },
+//            onGoToAppSettingsClick = {
+//               activity.openAppSettings()
+//               activity.finish()
+//            }
+//         )
 
          AlertDialog(
-            modifier = Modifier,
             onDismissRequest = {
-               logDebug(tag, "AlertDialog OnDismiss()")
-               dialogOpen = false
+               logVerbose(tag,"onDismissRequest()")
+               viewModel.dismissDialog()
             },
-            // permission is granted, perform the confirm actions
             confirmButton = {
                TextButton(
                   onClick = {
-                     logDebug(tag, " AlertDialog confirmButton() $permission")
-                     // remove granted permission from the permissionQueue
-                     mainViewModel.removePermission()
-                     // launch the dialog again if further permissions are required
-                     multiplePermissionRequestLauncher.launch(arrayOf(permission))
-                     // close the dialog
-                     dialogOpen = false
+                     if (isPermanentlyDeclined) {
+                        logVerbose(tag, "confirmButton -> finish()")
+                        activity.finish()
+                     } else {
+                        logVerbose(tag, "confirmButton -> onOkClick()")
+                        viewModel.dismissDialog()
+                        // request permission again
+                        multiplePermissionsRequestLauncher.launch(
+                           arrayOf(permission)
+                        )
+                     }
                   }
                ) {
-                  Text(text = "Zustimmen")
+                  Text(text = if (isPermanentlyDeclined) {
+                                 "App beenden"
+                              } else {
+                                 "Zustimmen"
+                              }
+                  )
                }
             },
-            // permission is declined, perform the decline actions
             dismissButton = {
                TextButton(
                   onClick = {
-                     logDebug(tag, "AlertDialog dismissButton() $permission")
-                     if (! isPermanentlyDeclined) {
-                        // remove permanently declined permissions from the permissionQueue
-                        mainViewModel.removePermission()
-                        // launch the dialog again if further permissions are required
-                        multiplePermissionRequestLauncher.launch(arrayOf(permission))
-                     } else {
-                        logDebug(tag, "openAppSettings() $permission and exit the app")
-                        // as a last resort, go to the app settings and close the app
+                     if (isPermanentlyDeclined) {
+                        logVerbose(tag,"dismissButton -> onGotoAppSettingsClick()")
                         activity.openAppSettings()
+
+                     } else {
+                        logVerbose(tag,"dismissButton -> finish()")
+                        viewModel.dismissDialog()
                         activity.finish()
+                        // request permission again
+                        multiplePermissionsRequestLauncher.launch(
+                           arrayOf(permission)
+                        )
                      }
-                     // close the dialog
-                     dialogOpen = false
+
                   }
                ) {
-                  Text(text = "Ablehnen")
+                  Text(text = if (isPermanentlyDeclined) {
+                                 "App Berechtigungen zeigen"
+                              } else {
+                                 "App beenden"
+                              }
+                  )
                }
             },
-            icon = {},
             title = {
-               Text(text = "Zustimmung erforderlich (Permission)")
+               Text(text = "Berechtigung erforderlich")
             },
             text = {
                Text(
-                  text = permissionText?.getDescription(context,
-                     isPermanentlyDeclined = isPermanentlyDeclined
-                  ) ?: ""
+                  text = permissionText
                )
             }
          )
+
       }
 }
 
 
-
 fun arePermissionsAlreadyGranted(
    context: Context,
-   permissionsToRequest: Array<String>,
-   tag: String
+   permissionsToRequest: List<String>
 ): Boolean {
-   permissionsToRequest.forEach { permissionToRequest ->
-      if (ContextCompat.checkSelfPermission(context,permissionToRequest)
+   permissionsToRequest.forEach { permission ->
+      if (ContextCompat.checkSelfPermission(context, permission)
          == PackageManager.PERMISSION_GRANTED) {
-         logDebug(tag, "requestPermission() $permissionToRequest already granted")
+         logVerbose("ok>arePermissionsGranted", "already granted: $permission")
       } else {
          // permission must be requested
          return false
@@ -164,3 +171,5 @@ fun arePermissionsAlreadyGranted(
    // all permission are already granted
    return true
 }
+
+

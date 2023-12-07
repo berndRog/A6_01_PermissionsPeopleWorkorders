@@ -44,6 +44,7 @@ import de.rogallab.mobile.R
 import de.rogallab.mobile.domain.UiState
 import de.rogallab.mobile.domain.entities.Person
 import de.rogallab.mobile.domain.utilities.logDebug
+import de.rogallab.mobile.domain.utilities.logVerbose
 import de.rogallab.mobile.ui.composables.HandleUiStateError
 import de.rogallab.mobile.ui.composables.LogUiStates
 import de.rogallab.mobile.ui.composables.PersonCard
@@ -135,8 +136,10 @@ fun PeopleSwipeListScreen(
 
          var list: MutableList<Person> = remember { mutableListOf<Person>() }
          if (uiStateListPersonFlow is UiState.Success) {
-            list = (uiStateListPersonFlow as UiState.Success<List<Person>>).data as MutableList<Person>
-            logDebug(tag, "uiStatePeople.Success items.size ${list.size}")
+            (uiStateListPersonFlow as UiState.Success<List<Person>>).data?.let{
+               list = it as MutableList<Person>
+               logVerbose(tag, "uiStatePeople.Success items.size ${list.size}")
+            }
          }
 
          LazyColumn(

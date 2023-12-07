@@ -15,7 +15,7 @@ interface IPeopleRepository {
    suspend fun update(personDto: PersonDto): Boolean
    suspend fun remove(personDto: PersonDto): Boolean
 
-   suspend fun findbyIdWithWorkorders(id: UUID): PersonDtoWithWorkorderDtos?
-   suspend fun loadPersonWithWorkorders(id:UUID): Map<PersonDto, List<WorkorderDto>>
+   suspend fun selectByIdWithWorkorders(id: UUID): PersonDtoWithWorkorderDtos?
+   suspend fun findByIdWithWorkorders(id:UUID): Map<PersonDto, List<WorkorderDto>>
 }
 

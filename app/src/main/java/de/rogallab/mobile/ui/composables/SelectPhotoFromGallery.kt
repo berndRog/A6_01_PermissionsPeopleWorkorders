@@ -37,7 +37,7 @@ fun SelectPhotoFromGallery(
    val context = LocalContext.current
 
    // callback for result from photo gallery
-   val launcher = rememberLauncherForActivityResult(
+   val galleryLauncher = rememberLauncherForActivityResult(
       contract = ActivityResultContracts.GetContent()
    ) { uri: Uri? ->
       // get bitmap from content resolver (photo gallery)
@@ -59,13 +59,11 @@ fun SelectPhotoFromGallery(
       }
    }
 
-
-
    Button(
       modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
       onClick = {
          logDebug("ok>SelectPhotoFromGale.", "Click")
-         launcher.launch("image/*")
+         galleryLauncher.launch("image/*")
       }
    ) {
       Row(
@@ -81,5 +79,4 @@ fun SelectPhotoFromGallery(
          )
       }
    }
-
 }

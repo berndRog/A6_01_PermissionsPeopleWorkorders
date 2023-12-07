@@ -75,9 +75,9 @@ class WordordersRepositoryImpl @Inject constructor(
          return@withContext true
       }
 
-   override suspend fun loadWorkorderWithPerson(id: UUID): Map<WorkorderDto, PersonDto?> =
+   override suspend fun findByIdWithPerson(id: UUID): Map<WorkorderDto, PersonDto?> =
       withContext(_dispatcher + _exceptionHandler) {
-         val map = _workordersDao.loadWorkorderWithPerson(id)
+         val map = _workordersDao.findByIdWithPerson(id)
          logDebug(tag, ",loadWorkorderWithPerson()")
          return@withContext map
       }

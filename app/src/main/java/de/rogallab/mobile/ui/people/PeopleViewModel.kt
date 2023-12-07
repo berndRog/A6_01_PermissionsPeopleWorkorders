@@ -189,7 +189,7 @@ class PeopleViewModel @Inject constructor(
       try {
          _coroutineScope.launch {
             val personDtoWithWorkorderDtos = _coroutineScope.async {
-               _peopleRepository.findbyIdWithWorkorders(id)
+               _peopleRepository.selectByIdWithWorkorders(id)
             }.await()
             personDtoWithWorkorderDtos?.let {
                val person = it.toPerson()

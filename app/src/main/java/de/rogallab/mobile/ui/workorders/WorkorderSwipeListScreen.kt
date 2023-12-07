@@ -43,6 +43,7 @@ import de.rogallab.mobile.domain.UiState
 import de.rogallab.mobile.domain.entities.Workorder
 import de.rogallab.mobile.domain.utilities.logDebug
 import de.rogallab.mobile.domain.utilities.logInfo
+import de.rogallab.mobile.domain.utilities.logVerbose
 import de.rogallab.mobile.ui.composables.HandleUiStateError
 import de.rogallab.mobile.ui.composables.LogUiStates
 import de.rogallab.mobile.ui.composables.SetCardElevation
@@ -74,7 +75,7 @@ fun WorkordersSwipeListScreen(
       }
    )
 
-   val uiStateWorkorderFlow: UiState<Workorder> by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+   val uiStateWorkorderFlow: UiState<Workorder> by viewModel.uiStateWorkorderFlow.collectAsStateWithLifecycle()
    LogUiStates(uiStateWorkorderFlow,"UiState Workorder", tag )
 
    val uiStateListWorkorderFlow: UiState<List<Workorder>> by viewModel.uiStateListWorkorderFlow.collectAsStateWithLifecycle()
@@ -149,8 +150,10 @@ fun WorkordersSwipeListScreen(
 
          var list: MutableList<Workorder> = remember { mutableListOf() }
          if (uiStateListWorkorderFlow is UiState.Success) {
-            list = (uiStateListWorkorderFlow as UiState.Success<List<Workorder>>).data as MutableList<Workorder>
-            logDebug(tag, "uiStatePeople.Success items.size ${list.size}")
+            (uiStateListWorkorderFlow as UiState.Success<List<Workorder>>).data?.let{
+               list = it as MutableList<Workorder>
+               logVerbose(tag, "uiStateWorkorderFlow.Success items.size ${list.size}")
+            }
          }
 
          list.sortBy { it.state }
@@ -235,7 +238,7 @@ fun WorkordersSwipeListScreen(
                snackbarHostState = snackbarHostState,
                navController = navController,
                routePopBack = NavScreen.WorkordersList.route,
-               onUiStateFlowChange = { viewModel.onUiStateFlowChange(it) },
+               onUiStateFlowChange = { viewModel.onUiStateWorkorderFlowChange(it) },
                tag = tag
             )
          }

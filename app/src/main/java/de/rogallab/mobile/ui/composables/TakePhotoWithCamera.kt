@@ -32,8 +32,6 @@ fun TakePhotoWithCamera(
    onImagePathChanged: (String?) -> Unit,  // Event ↑
 ) {
    val tag = "ok>TakePhotoWithCamera."
-   logDebug(tag, "Start")
-
    val context = LocalContext.current
 
    // callback camera
